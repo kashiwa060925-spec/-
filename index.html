@@ -60,7 +60,6 @@
   .bigbtn{display:block;width:100%;padding:1rem 1.2rem;border-radius:14px;background:#121639;border:1px solid #2a2f66;color:#cfe0ff;font-weight:700;cursor:pointer}
   .bigbtn:hover{background:#1a2053}
   .sub{font-size:.9rem;color:#aab6d6}
-  /* language bubble on start */
   .lang-fab{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));background:#121639;border:1px solid #2a2f66;border-radius:12px;color:#cfe0ff;cursor:pointer;padding:.45rem .6rem}
   .lang-panel{position:absolute;top:calc(max(16px,env(safe-area-inset-top)) + 40px);right:max(16px,env(safe-area-inset-right));background:#0f1433;border:1px solid #2a2f66;border-radius:12px;padding:.6rem;display:grid;gap:.5rem;min-width:220px;transform-origin:top right;scale:.98;opacity:0;pointer-events:none;transition:opacity .15s ease, scale .15s ease}
   .lang-panel.open{opacity:1;scale:1;pointer-events:auto}
@@ -70,8 +69,6 @@
   .divider{height:1px;background:#2a2f66;width:100%;opacity:.6;margin:.3rem 0}
   .hint{color:#aab6d6;font-size:.85rem}
   .badge{display:inline-block;background:#0f1536;border:1px solid #2a2f66;padding:.2rem .5rem;border-radius:10px;color:#cfe0ff}
-  .chooser{display:grid;gap:.5rem;background:#0f1433;border:1px solid #2a2f66;border-radius:12px;padding:.8rem}
-  .chooser .btn{min-width:unset}
 </style>
 </head>
 <body>
@@ -97,20 +94,13 @@
     <div class="start-box">
       <div class="game-title" id="startTitle" data-i18n="start.title">ハクスラ・タップRPG</div>
       <div class="title-logo" id="titleLogo">⚔️ 🛡️ 💎</div>
-      <div class="hint"><span data-i18n="start.version">バージョン：</span><span id="verText">0.5.0</span> ／ <span data-i18n="start.save_detect">セーブ検出：</span><span id="saveDetect" class="badge">…</span></div>
+      <div class="hint"><span data-i18n="start.version">バージョン：</span><span id="verText">0.7.1</span> ／ <span data-i18n="start.save_detect">セーブ検出：</span><span id="saveDetect" class="badge">…</span></div>
 
       <div class="start-actions">
-        <button id="btnContinue" class="bigbtn" data-i18n="start.continue">コンティニュー</button>
-        <div id="continueChooser" class="chooser" hidden>
-          <div class="hint" data-i18n="start.choose_how">続き方を選んでください</div>
-          <div class="inline" style="gap:.6rem">
-            <button id="btnFromLocal" class="btn" data-i18n="start.from_local">ローカルから続き</button>
-            <button id="btnFromFile" class="btn" data-i18n="start.from_file">ファイルから続き</button>
-            <input id="fileOpenStart" type="file" accept="application/json" hidden>
-          </div>
-        </div>
-        <button id="btnNewGame" class="bigbtn" data-i18n="start.new_game">ニューゲーム</button>
+        <button id="btnPrimary" class="bigbtn" data-mode="local" data-i18n="start.continue">コンティニュー</button>
+        <input id="fileOpenStart" type="file" accept="application/json" hidden>
 
+        <button id="btnNewGame" class="bigbtn" data-i18n="start.new_game">ニューゲーム</button>
         <div id="newWrap" hidden>
           <div class="divider"></div>
           <div class="inline"><label for="startName" data-i18n="start.username">ユーザーネーム</label><input id="startName" class="input" maxlength="20" placeholder="名前" data-i18n-ph="start.username_ph"></div>
@@ -305,7 +295,7 @@
 </main>
 
 <script>
-const GAME_VERSION='0.5.0';
+const GAME_VERSION='0.7.1';
 const SAVE_KEY='tap_hns_save_v5', UI_MODE='ui_top_mode_v7';
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
@@ -313,7 +303,7 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const I18N={
   ja:{
     'common.ok':'OK','common.save':'保存','common.back':'戻る',
-    'start.lang_btn':'言語','start.title':'ハクスラ・タップRPG','start.version':'バージョン：','start.save_detect':'セーブ検出：','start.continue':'コンティニュー','start.choose_how':'続き方を選んでください','start.from_local':'ローカルから続き','start.from_file':'ファイルから続き','start.new_game':'ニューゲーム','start.username':'ユーザーネーム','start.username_ph':'名前','start.name_hint':'※後から設定で変更できます','start.begin':'はじめる','start.note':'ここで仕様チェックを行い、開始後にデータを読み込みます。',
+    'start.lang_btn':'言語','start.title':'ハクスラ・タップRPG','start.version':'バージョン：','start.save_detect':'セーブ検出：','start.continue':'コンティニュー','start.new_game':'ニューゲーム','start.username':'ユーザーネーム','start.username_ph':'名前','start.name_hint':'※後から設定で変更できます','start.begin':'はじめる','start.note':'ここで仕様チェックを行い、開始後にデータを読み込みます。',
     'ui.more':'▼ 詳細','ui.more_close':'▲ 閉じる','ui.wallet':'所持','ui.floor':'階層','ui.hp':'HP','ui.souls':'ソウル','ui.crit':'クリ率',
     'tabs.upgrade':'強化','tabs.inventory':'装備','tabs.status':'ステータス','tabs.adv':'転生/聖遺物','tabs.settings':'設定/セーブ',
     'battle.start':'戦闘開始！','battle.tap':'攻撃（タップ）','battle.kill':'倒す','battle.attack':'攻撃',
@@ -333,7 +323,7 @@ const I18N={
   },
   en:{
     'common.ok':'OK','common.save':'Save','common.back':'Back',
-    'start.lang_btn':'Language','start.title':'Hack & Slash Tap RPG','start.version':'Version: ','start.save_detect':'Save found: ','start.continue':'Continue','start.choose_how':'Choose how to continue','start.from_local':'Continue from Local','start.from_file':'Continue from File','start.new_game':'New Game','start.username':'Username','start.username_ph':'Name','start.name_hint':'* You can change it later in Settings','start.begin':'Start','start.note':'We check game specs here, then load your data after starting.',
+    'start.lang_btn':'Language','start.title':'Hack & Slash Tap RPG','start.version':'Version: ','start.save_detect':'Save found: ','start.continue':'Continue','start.new_game':'New Game','start.username':'Username','start.username_ph':'Name','start.name_hint':'* You can change it later in Settings','start.begin':'Start','start.note':'We check game specs here, then load your data after starting.',
     'ui.more':'▼ Details','ui.more_close':'▲ Close','ui.wallet':'Wallet','ui.floor':'Floor','ui.hp':'HP','ui.souls':'Souls','ui.crit':'Crit',
     'tabs.upgrade':'Upgrade','tabs.inventory':'Inventory','tabs.status':'Status','tabs.adv':'Ascend/Relics','tabs.settings':'Settings/Save',
     'battle.start':'Begin Battle!','battle.tap':'Attack (Tap)','battle.kill':'Finish','battle.attack':'Attack',
@@ -353,7 +343,7 @@ const I18N={
   },
   zh:{
     'common.ok':'确定','common.save':'保存','common.back':'返回',
-    'start.lang_btn':'语言','start.title':'刷刷刷点击RPG','start.version':'版本：','start.save_detect':'存档检测：','start.continue':'继续游戏','start.choose_how':'请选择继续方式','start.from_local':'从本地继续','start.from_file':'从文件继续','start.new_game':'新游戏','start.username':'用户名','start.username_ph':'名字','start.name_hint':'* 之后可在设置中修改','start.begin':'开始','start.note':'此处检查规格，开始后载入数据。',
+    'start.lang_btn':'语言','start.title':'刷刷刷点击RPG','start.version':'版本：','start.save_detect':'存档检测：','start.continue':'继续游戏','start.new_game':'新游戏','start.username':'用户名','start.username_ph':'名字','start.name_hint':'* 之后可在设置中修改','start.begin':'开始','start.note':'此处检查规格，开始后载入数据。',
     'ui.more':'▼ 详细','ui.more_close':'▲ 关闭','ui.wallet':'持有','ui.floor':'楼层','ui.hp':'生命','ui.souls':'灵魂','ui.crit':'暴击',
     'tabs.upgrade':'强化','tabs.inventory':'装备','tabs.status':'状态','tabs.adv':'转生/圣遗物','tabs.settings':'设置/保存',
     'battle.start':'开始战斗！','battle.tap':'攻击（点击）','battle.kill':'击杀','battle.attack':'攻击',
@@ -375,25 +365,16 @@ const I18N={
 
 function t(key, params){ const lang=state.lang||'ja'; let s=(I18N[lang]&&I18N[lang][key])||(I18N['ja'][key]||key); if(params){ for(const k in params){ s=s.replace(new RegExp('\\{'+k+'\\}','g'), params[k]); } } return s; }
 function applyI18n(){ document.documentElement.lang=state.lang||'ja';
-  // Simple text nodes with data-i18n
   $$('[data-i18n]').forEach(el=>{ el.innerHTML=t(el.getAttribute('data-i18n')); });
-  // Placeholders
   $$('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')) ); });
-  // Wraps where key sits on label part
   $$('[data-i18n-wrap]').forEach(el=>{
-    const key=el.getAttribute('data-i18n-wrap'); const txt=t(key); // keep inner HTML (values)
-    const html=el.innerHTML; // try to replace leading label before value tags
-    // Strategy: find first <b> or <span id> and insert label before it
+    const key=el.getAttribute('data-i18n-wrap'); const txt=t(key);
     const child=el.querySelector('b, span[id], input, select, textarea');
-    if(child){ const before=txt; // label
-      el.innerHTML=''; const label=document.createElement('span'); label.textContent=before; el.appendChild(label); el.appendChild(document.createTextNode(' ')); el.appendChild(child); }
+    if(child){ el.innerHTML=''; const label=document.createElement('span'); label.textContent=txt; el.appendChild(label); el.appendChild(document.createTextNode(' ')); el.appendChild(child); }
     else { el.textContent=txt+' '+el.textContent; }
   });
-  // Toggle button text
   const toggle=ui.toggleInfo; if(toggle){ const open=toggle.getAttribute('aria-expanded')==='true'; toggle.textContent=open?t('ui.more_close'):t('ui.more'); }
-  // Footnote
   const foot=$('#footnoteBoss'); if(foot) foot.innerHTML=t('foot.boss');
-  // Continue chooser buttons likely already updated
 }
 
 // ====== Game State
@@ -415,11 +396,11 @@ const state={
 };
 const prices={atk:10,hp:10,auto:25};
 
-// ====== UI refs (short)
+// ====== UI refs
 const ui={
   startOverlay:$('#startOverlay'), verText:$('#verText'), saveDetect:$('#saveDetect'),
   startLangFab:$('#startLangFab'), startLangPanel:$('#startLangPanel'), startLang:$('#startLang'), startLangApply:$('#startLangApply'),
-  btnContinue:$('#btnContinue'), continueChooser:$('#continueChooser'), btnFromLocal:$('#btnFromLocal'), btnFromFile:$('#btnFromFile'), fileOpenStart:$('#fileOpenStart'),
+  btnPrimary:$('#btnPrimary'), fileOpenStart:$('#fileOpenStart'),
   btnNewGame:$('#btnNewGame'), newWrap:$('#newWrap'), startName:$('#startName'), btnBegin:$('#btnBegin'), btnCancelNew:$('#btnCancelNew'), startNote:$('#startNote'),
   c_gold:$('#c-gold'), c_level:$('#c-level'), c_exp:$('#c-exp'), x_floor:$('#x-floor'), x_level:$('#x-level'), x_exp:$('#x-exp'), x_hpbar:$('#x-hpbar'), x_hptext:$('#x-hptext'), x_atk:$('#x-atk'), x_gold:$('#x-gold'), x_souls:$('#x-souls'), x_crit:$('#x-crit'), timerAll:$('#timerAll'), toggleInfo:$('#toggleInfo'), topCollapsed:$('#top-collapsed'), topExpanded:$('#top-expanded'),
   floorBadge:$('#floorBadge'), monsterFace:$('#monsterFace'), monsterHP:$('#monsterHP'), monsterHPText:$('#monsterHPText'), monsterName:$('#monsterName'), attackBtn:$('#attackBtn'), logline:$('#logline'),
@@ -469,7 +450,7 @@ function makeItem(f, minRarity){
 }
 function renderItemText(it){const p=[];if(it.atk)p.push(`ATK+${it.atk}`);if(it.hp)p.push(`HP+${it.hp}`);if(it.def)p.push(`防御+${it.def}`);if(it.crit)p.push(`クリ+${it.crit}%`);if(it.goldB)p.push(`Gold+${it.goldB}%`);return `${it.name} [${p.join(', ')}]`}
 function scoreItem(it){if(!it)return-1e9;let s=0;s+=(it.atk??0)*3+(it.hp??0)*0.4+(it.def??0)*2+(it.crit??0)*1.5+(it.goldB??0)*0.8;s+=(it.lvl??0)*0.2;const rar=RARITIES.find(r=>r.name===it.rarity);s*=rar?.mult??1;return s}
-function tryAutoEquip(it){const s=it.slot,cur=state.eq[s];if(scoreItem(it)>scoreItem(cur)){state.eq[s]=it;toast(tr('msg.drop',{text:renderItemText(it)}))}}
+function tryAutoEquip(it){const s=it.slot,cur=state.eq[s];if(scoreItem(it)>scoreItem(cur)){state.eq[s]=it;toast(`装備：${renderItemText(it)}`)}}
 
 // ====== Monsters
 const MONSTER_POOL=[{name:'ゴブリン',emoji:'👹'},{name:'スケルトン',emoji:'💀'},{name:'コウモリ',emoji:'🦇'},{name:'オオカミ',emoji:'🐺'},{name:'スライム',emoji:'🫧'},{name:'ミイラ',emoji:'🧻'},{name:'魔導書',emoji:'📕'},{name:'目玉',emoji:'👁️'},{name:'サソリ',emoji:'🦂'}];
@@ -505,9 +486,10 @@ function awardKill(){
   if(state.floor>state.maxFloor)state.maxFloor=state.floor; if(state.maxFloor>state.bestMaxFloor)state.bestMaxFloor=state.maxFloor;
 }
 
-// ====== Messages
+// ====== Messages & helpers
 function postKillFlavor(kills){ if(kills>=2){ ui.logline.textContent = t('msg.killed_many',{n:kills}); } }
 function toast(m){ ui.logline.textContent=m }
+function hasSave(){ return !!localStorage.getItem(SAVE_KEY) }
 
 // ====== Combat
 function updateAttackBtn(){const m=state.monster;if(!m){ui.attackBtn.textContent=t('battle.attack');return}const expected=playerATK();if(!state.engaged){ ui.attackBtn.textContent=(expected>=m.hp)?t('battle.kill'):t('battle.start'); return } ui.attackBtn.textContent=(expected>=m.hp)?t('battle.kill'):t('battle.tap'); }
@@ -518,7 +500,7 @@ function attack(){ if(!state.monster) return; if(state.playerHP<=0){ toast('…'
 function enemyTick(dt){ if(!state.monster||!state.engaged||state.isDown)return; const m=state.monster; if(m.hp<=0)return; const dps=Math.max(0,m.atk-playerDEF()*0.6); const dmg=dps*dt; if(dmg<=0)return; state.playerHP-=dmg; if(state.playerHP<=0&&!state.isDown){ state.playerHP=0; state.isDown=true; state.deaths+=1; state.reviveAt=Date.now()+5000; ui.logline.textContent=t('msg.downed',{s:5}); } }
 function regenTick(dt){ if(state.playerHP>0){ const mx=recalcMaxHP(); state.playerHP=clamp(state.playerHP+dt*(0.8+state.level*0.02),0,mx); } }
 function autoTapTick(dt){ if(state.autoTap<=0||!state.engaged||state.isDown) return; autoTapTick._acc=(autoTapTick._acc||0)+state.autoTap*dt; while(autoTapTick._acc>=1){ autoTapTick._acc-=1; attack(); } }
-function timersTick(){ let txt=[]; if(state.reviveAt>0){ const left=Math.max(0,state.reviveAt-Date.now()); txt.push(t('msg.revive_in')||t('msg.downed',{s:Math.ceil(left/1000)})); if(left<=0){ state.reviveAt=0; state.playerHP=recalcMaxHP(); state.isDown=false; state.engaged=false; ui.logline.textContent=t('msg.revive'); updateAttackBtn(); } } if(state.bossEndsAt>0){ const left=Math.max(0,state.bossEndsAt-Date.now()); txt.push(`${Math.ceil(left/1000)}s`); if(left<=0){ state.bossEndsAt=0; toast('…'); state.floor=Math.max(1,state.floor-1); spawnMonster(); } } ui.timerAll.textContent=txt.join(' / '); }
+function timersTick(){ let txt=[]; if(state.reviveAt>0){ const left=Math.max(0,state.reviveAt-Date.now()); txt.push(`${Math.ceil(left/1000)}s`); if(left<=0){ state.reviveAt=0; state.playerHP=recalcMaxHP(); state.isDown=false; state.engaged=false; ui.logline.textContent=t('msg.revive'); updateAttackBtn(); } } if(state.bossEndsAt>0){ const left=Math.max(0,state.bossEndsAt-Date.now()); txt.push(`${Math.ceil(left/1000)}s`); if(left<=0){ state.bossEndsAt=0; toast('…'); state.floor=Math.max(1,state.floor-1); spawnMonster(); } } ui.timerAll.textContent=txt.join(' / '); }
 
 // ====== Save / Load
 function save(manual=false){ const data=JSON.stringify({state:{...state,bossEndsAt:state.bossEndsAt>0?Date.now()+Math.max(0,state.bossEndsAt-Date.now()):0,reviveAt:state.reviveAt>0?Date.now()+Math.max(0,state.reviveAt-Date.now()):0},prices}); localStorage.setItem(SAVE_KEY,data); if(manual) toast(t('msg.saved')); }
@@ -566,20 +548,39 @@ ui.wipeBtn&&ui.wipeBtn.addEventListener('click',wipeAll);
 ui.langSave&&ui.langSave.addEventListener('click',()=>{ state.lang=ui.langSelect.value||'ja'; save(true); applyI18n(); updateUI(); });
 ui.nameSave&&ui.nameSave.addEventListener('click',()=>{ const v=(ui.nameEdit.value||'').trim(); if(!v){ ui.startNote.textContent=t('msg.need_name'); return } state.username=v; save(true); });
 
-// Start overlay events
-ui.startLangFab.addEventListener('click',()=>{ const open=ui.startLangPanel.classList.toggle('open'); ui.startLangFab.setAttribute('aria-expanded', String(open)); ui.startLangPanel.setAttribute('aria-hidden', String(!open)); });
-ui.startLangApply.addEventListener('click',()=>{ const v=ui.startLang.value||'ja'; state.lang=v; save(false); applyI18n(); });
-ui.btnContinue.addEventListener('click',()=>{ ui.continueChooser.hidden = !ui.continueChooser.hidden; });
-ui.btnFromLocal.addEventListener('click',()=>{ if(!load(false)){ ui.startNote.textContent=t('msg.no_save'); return } ui.startOverlay.hidden=true; requestAnimationFrame(loop); });
-ui.btnFromFile.addEventListener('click',()=>openFileInput(ui.fileOpenStart));
+// Start overlay events + Primary button mode
+function setPrimaryButton(){
+  if(hasSave()){
+    ui.btnPrimary.setAttribute('data-mode','local');
+    ui.btnPrimary.innerHTML=t('start.continue');
+  } else {
+    ui.btnPrimary.setAttribute('data-mode','file');
+    ui.btnPrimary.innerHTML=t('import.from_file');
+  }
+}
+ui.btnPrimary.addEventListener('click',()=>{
+  const mode=ui.btnPrimary.getAttribute('data-mode');
+  if(mode==='local'){
+    if(!load(false)){ ui.startNote.textContent=t('msg.no_save'); return }
+    ui.startOverlay.hidden=true; requestAnimationFrame(loop);
+  } else {
+    openFileInput(ui.fileOpenStart);
+  }
+});
 ui.fileOpenStart.addEventListener('change',e=>{ const f=e.target.files?.[0]; if(f) handleFileChosen(f); });
+
+ui.startLangFab.addEventListener('click',()=>{ const open=ui.startLangPanel.classList.toggle('open'); ui.startLangFab.setAttribute('aria-expanded', String(open)); ui.startLangPanel.setAttribute('aria-hidden', String(!open)); });
+ui.startLangApply.addEventListener('click',()=>{ const v=ui.startLang.value||'ja'; state.lang=v; save(false); applyI18n(); setPrimaryButton(); });
 ui.btnNewGame.addEventListener('click',()=>{ ui.newWrap.hidden=false; ui.startName.focus(); });
 ui.btnCancelNew.addEventListener('click',()=>{ ui.newWrap.hidden=true; });
 ui.btnBegin.addEventListener('click',()=>{ const lang=ui.startLang.value||'ja'; const uname=(ui.startName.value||'').trim(); if(!uname){ ui.startNote.textContent=t('msg.need_name'); return } Object.assign(state,{lang,username:uname,lastSeenVersion:GAME_VERSION}); spawnMonster(); renderInventory(); updateUI(); save(false); applyI18n(); ui.startOverlay.hidden=true; requestAnimationFrame(loop); });
 
+// ====== Pricing & buy
+function buy(k,cb){ const c=prices[k]; if(state.gold<c){ toast(t('msg.money_short')); return } state.gold-=c; cb(); prices[k]=Math.floor(prices[k]*1.35+2); updateUI(); }
+
 // ====== Helpers
 function defaultDownloadName(){ const d=new Date(); const z=n=>String(n).padStart(2,'0'); const ts=`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`; const uname=(state.username||'User'); return `save-${uname}-${ts}` }
-function showStart(){ ui.verText.textContent=GAME_VERSION; const exist=!!localStorage.getItem(SAVE_KEY); ui.saveDetect.textContent=exist?t('common.ok'):'—'; ui.startOverlay.hidden=false; }
+function showStart(){ ui.verText.textContent=GAME_VERSION; const exist=hasSave(); ui.saveDetect.textContent=exist?'OK':'—'; ui.startOverlay.hidden=false; setPrimaryButton(); }
 function applyCollapsed(col){ if(col){ ui.topCollapsed.removeAttribute('hidden'); ui.topExpanded.setAttribute('hidden',''); ui.toggleInfo.setAttribute('aria-expanded','false'); ui.toggleInfo.textContent=t('ui.more'); } else { ui.topCollapsed.setAttribute('hidden',''); ui.topExpanded.removeAttribute('hidden'); ui.toggleInfo.setAttribute('aria-expanded','true'); ui.toggleInfo.textContent=t('ui.more_close'); } localStorage.setItem(UI_MODE,col?'1':'0') }
 ui.toggleInfo.addEventListener('click',()=>{ const col=ui.toggleInfo.getAttribute('aria-expanded')==='true'; applyCollapsed(col) });
 
@@ -591,8 +592,7 @@ function getItemDrop(){ const luck=(state.eq.ring?.goldB??0)*0.2; return 0.20 + 
 function getMimicP(){ const crit=playerCRIT(); return Math.min(0.15, 0.05 + crit*0.0005) }
 function getSuperMimicP(){ const crit=playerCRIT(); return Math.min(0.05, 0.02 + crit*0.0003) }
 
-(function init(){ applyCollapsed(localStorage.getItem(UI_MODE)!=='0'); // always title first
-  // attempt to load language from save
+(function init(){ applyCollapsed(localStorage.getItem(UI_MODE)!=='0');
   try{ const raw=localStorage.getItem(SAVE_KEY); if(raw){ const o=JSON.parse(raw); if(o?.state?.lang) state.lang=o.state.lang; if(o?.state?.username) state.username=o.state.username; } }catch(e){}
   applyI18n(); updateUI(); showStart(); window.addEventListener('beforeunload',()=>save(false)); })();
 </script>
