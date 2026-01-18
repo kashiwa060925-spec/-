@@ -247,7 +247,7 @@
       <div id="tab-adv" class="grid" hidden>
         <div class="card">
           <b>転生（パーマネント強化）</b>
-          <div class="small">転生で 石ころ→魔石 へ変換。恒久強化に使用（準備中）。</div>
+          <div class="small" id="ascDesc">転生で <b>ソウル</b> を獲得。ソウルは恒久的に<span class="gold">獲得ゴールド</span>と<b>攻撃力</b>を上げます。</div>
           <div class="row"><div>獲得見込み：<b id="soulGain">0</b> ソウル</div><button class="btn danger" id="ascendBtn">転生する</button></div>
         </div>
         <div class="card" id="relicKashiwaCard" hidden>
@@ -340,7 +340,7 @@ const ui={
   staAtk:$('#sta-atk'), staHP:$('#sta-hp'), staDef:$('#sta-def'), staCrit:$('#sta-crit'), staGoldB:$('#sta-goldb'), staSoulB:$('#sta-soulb'), staMaxFloor:$('#sta-maxfloor'), staKills:$('#sta-kills'), staDeaths:$('#sta-deaths'), staAutoTap:$('#sta-autotap'), staItemDrop:$('#sta-itemdrop'), staMimic:$('#sta-mimic'), staSuperMimic:$('#sta-supermimic'), staStoneDrop:$('#sta-stonedrop'), staStoneAmt:$('#sta-stoneamt'),
   bagGold:$('#bag-gold'), bagSoul:$('#bag-soul'), bagGem:$('#bag-gem'), bagPeb:$('#bag-peb'), bagEq:$('#bag-eq'),
   relicLockedCard:$('#relicLockedCard'), relicKashiwaCard:$('#relicKashiwaCard'), relicKashiwa:$('#relicKashiwa'),
-  ascendBtn:$('#ascendBtn'), soulGain:$('#soulGain'),
+  ascendBtn:$('#ascendBtn'), soulGain:$('#soulGain'), ascDesc:$('#ascDesc'),
   codeInput:$('#codeInput'), codeBtn:$('#codeBtn'), codeStatus:$('#codeStatus'),
   exportName:$('#exportName'), downloadBtn:$('#downloadBtn'),
   importFileBtn:$('#importFileBtn'), fileOpenSettings:$('#fileOpenSettings'),
@@ -363,7 +363,7 @@ function eGold(f,b){return Math.floor((4*Math.pow(f,1.10)+2)*(b?4:1))}
 function eATK(f,b){return Math.floor((1.2*Math.pow(f,1.05)+0.6)*(b?2:1))}
 function cryptoId(){const a=new Uint32Array(2);(window.crypto||window.msCrypto).getRandomValues?.(a);return[...a].map(x=>x.toString(16)).join('')}
 
-// ====== Items
+// ====== Items (same as before)
 const RARITIES=[{name:'Common',weight:60,mult:1},{name:'Uncommon',weight:25,mult:1.4},{name:'Rare',weight:10,mult:2},{name:'Epic',weight:4,mult:3},{name:'Legendary',weight:1,mult:4.5}];
 function weightedPick(arr){const t=arr.reduce((s,i)=>s+i.weight,0);let r=Math.random()*t;for(const it of arr){r-=it.weight;if(r<=0)return it}return arr[arr.length-1]}
 function makeItem(f, minRarity){
@@ -381,23 +381,10 @@ function renderItemText(it){const p=[];if(it.atk)p.push(`ATK+${it.atk}`);if(it.h
 function scoreItem(it){if(!it)return-1e9;let s=0;s+=(it.atk??0)*3+(it.hp??0)*0.4+(it.def??0)*2+(it.crit??0)*1.5+(it.goldB??0)*0.8;s+=(it.lvl??0)*0.2;const rar=RARITIES.find(r=>r.name===it.rarity);s*=rar?.mult??1;return s}
 function tryAutoEquip(it){const s=it.slot,cur=state.eq[s];if(scoreItem(it)>scoreItem(cur)){state.eq[s]=it;toast(`装備：${renderItemText(it)}`)}}
 
-// ====== Monsters
-const MONSTER_POOL=[
-  {name:'ゴブリン',emoji:'👹'},
-  {name:'スケルトン',emoji:'💀'},
-  {name:'コウモリ',emoji:'🦇'},
-  {name:'オオカミ',emoji:'🐺'},
-  {name:'スライム',emoji:'🫧'},
-  {name:'ミイラ',emoji:'🧻'},
-  {name:'魔導書',emoji:'📕'},
-  {name:'目玉',emoji:'👁️'},
-  {name:'サソリ',emoji:'🦂'}
-];
+// ====== Monsters (incl. Mimic as separate species)
+const MONSTER_POOL=[{name:'ゴブリン',emoji:'👹'},{name:'スケルトン',emoji:'💀'},{name:'コウモリ',emoji:'🦇'},{name:'オオカミ',emoji:'🐺'},{name:'スライム',emoji:'🫧'},{name:'ミイラ',emoji:'🧻'},{name:'魔導書',emoji:'📕'},{name:'目玉',emoji:'👁️'},{name:'サソリ',emoji:'🦂'}];
 const BOSS_POOL=[{name:'オーガ',emoji:'👺'},{name:'ドラゴン',emoji:'🐲'},{name:'リッチ',emoji:'🪦'},{name:'ケルベロス',emoji:'🐶'}];
-const SPECIAL_POOL=[
-  {name:'ミミック',emoji:'🧰', kind:'mimic', mult:1.05, goldMult:10, minRarity:'Rare'},
-  {name:'スーパーミミック',emoji:'✨🧰', kind:'supermimic', mult:1.20, goldMult:100, minRarity:'Epic'}
-];
+const SPECIAL_POOL=[{name:'ミミック',emoji:'🧰', kind:'mimic', mult:1.05, goldMult:10, minRarity:'Rare'},{name:'スーパーミミック',emoji:'✨🧰', kind:'supermimic', mult:1.20, goldMult:100, minRarity:'Epic'}];
 
 function spawnMonster(){
   const f=state.floor; const isBoss=(f%10===0);
@@ -419,7 +406,7 @@ function spawnMonster(){
   refreshFloorButtons(); updateAttackBtn();
 }
 
-// ====== Rewards
+// ====== Rewards & progression
 function awardKill(){
   const m=state.monster;
   if(Math.random()<0.05){ const k=Math.floor(state.floor/10); if(k>0){ state.pebbles+=k; toast(`+${k}`); }}
@@ -436,7 +423,6 @@ function awardKill(){
   if(state.floor>state.maxFloor)state.maxFloor=state.floor; if(state.maxFloor>state.bestMaxFloor)state.bestMaxFloor=state.maxFloor;
 }
 
-// ====== Messages & helpers
 function postKillFlavor(kills){ if(kills>=2){ ui.logline.textContent = `敵を${kills}体倒した！`; } }
 function toast(m){ ui.logline.textContent=m }
 function hasSave(){ return !!localStorage.getItem(SAVE_KEY) }
@@ -504,13 +490,20 @@ $$('[data-bulk]').forEach(btn=>{
 });
 
 function buyMany(k, n){
-  let cnt=0; for(let i=0;i<n;i++){ const ok=buy(k,(()=>{}), true); if(!ok) break; cnt++; if(k==='atk'){ state.baseATK+=1; state.upg.atk++; } else if(k==='hp'){ state.baseHP+=5; state.upg.hp++; state.playerHP=recalcMaxHP(); } else if(k==='auto'){ state.autoTap=parseFloat((state.autoTap+0.2).toFixed(1)); state.upg.auto++; } }
+  let cnt=0; 
+  for(let i=0;i<n;i++){
+    let ok=false;
+    if(k==='atk')      ok = buy('atk', ()=>{ state.baseATK+=1; state.upg.atk++; });
+    else if(k==='hp')  ok = buy('hp',  ()=>{ state.baseHP+=5; state.upg.hp++; state.playerHP=recalcMaxHP(); });
+    else if(k==='auto')ok = buy('auto',()=>{ state.autoTap=parseFloat((state.autoTap+0.2).toFixed(1)); state.upg.auto++; });
+    if(!ok) break;
+    cnt++;
+  }
   updateAttackBtn(); updateUI(); return cnt;
 }
 
 function buy(k,cb, dry=false){ const c=prices[k]; if(state.gold<c){ if(!dry) toast('お金が足りない…'); return false } if(!dry){ state.gold-=c; cb(); }
-  prices[k]=Math.floor(prices[k]*1.35+2); updateUI(); return true;
-}
+  prices[k]=Math.floor(prices[k]*1.35+2); updateUI(); return true; }
 
 ui.autoEquip&&ui.autoEquip.addEventListener('change',e=>{ state.autoEquip=e.target.checked; save(false) });
 
@@ -554,7 +547,16 @@ ui.toggleInfo.addEventListener('click',()=>{ const col=ui.toggleInfo.getAttribut
 // ====== Loop & init
 let last=performance.now(); function loop(now){ const dt=Math.min(0.1,(now-last)/1000); last=now; autoTapTick(dt); enemyTick(dt); regenTick(dt); timersTick(); updateUI(); requestAnimationFrame(loop) }
 function updateUI(){ ui.c_gold.textContent=Math.floor(state.gold); ui.c_level.textContent=state.level; ui.c_exp.textContent=`${state.exp}/${state.expToNext}`; ui.x_floor.textContent=state.floor; ui.x_level.textContent=state.level; ui.x_exp.textContent=`${state.exp}/${state.expToNext}`; ui.x_atk.textContent=playerATK(); ui.x_gold.textContent=Math.floor(state.gold); ui.x_souls.textContent=state.souls; ui.x_crit.textContent=`${Math.floor(playerCRIT())}%`; const mx=recalcMaxHP(); const pct=clamp(state.playerHP/mx*100,0,100); ui.x_hpbar.style.width=`${pct}%`; ui.x_hptext.textContent=`${Math.floor(state.playerHP)}/${mx}`; ui.upgGold.textContent=Math.floor(state.gold); ui.lvAtk.textContent=state.upg.atk; ui.lvHP.textContent=state.upg.hp; ui.lvAuto.textContent=state.upg.auto; ui.countAtk.textContent=`購入回数：${state.upg.atk}`; ui.countHP.textContent=`購入回数：${state.upg.hp}`; ui.countAuto.textContent=`購入回数：${state.upg.auto}`; ui.autoRate.textContent=state.autoTap.toFixed(1); ui.costAtk.textContent=prices.atk; ui.costHP.textContent=prices.hp; ui.costAuto.textContent=prices.auto; if(ui.staAtk){ ui.staAtk.textContent=playerATK(); ui.staHP.textContent=recalcMaxHP(); ui.staDef.textContent=playerDEF(); ui.staCrit.textContent=`${Math.floor(playerCRIT())}%`; ui.staGoldB.textContent=`${Math.floor(goldB())}%`; ui.staSoulB.textContent=`${Math.floor((soulMG()-1)*100)}%`; ui.staMaxFloor.textContent=state.maxFloor; ui.staKills.textContent=state.kills; ui.staDeaths.textContent=state.deaths; ui.staAutoTap.textContent=state.autoTap.toFixed(1); ui.staItemDrop.textContent=`${(getItemDrop()*100).toFixed(1)}%`; ui.staMimic.textContent='3.00%'; ui.staSuperMimic.textContent='1.20%'; ui.staStoneDrop.textContent='5%'; ui.staStoneAmt.textContent=Math.floor(state.floor/10); }
-  ui.bagGold.textContent=Math.floor(state.gold); ui.bagSoul.textContent=state.souls; ui.bagGem.textContent=state.magicStones; ui.bagPeb.textContent=state.pebbles; ui.bagEq.textContent=state.inv.length; ui.floorBadge.textContent=`階層 ${state.floor}`; if(state.unlocks.kashiwa){ ui.relicLockedCard.setAttribute('hidden',''); ui.relicKashiwaCard.removeAttribute('hidden'); ui.relicKashiwa.checked=!!state.relicActive.kashiwa; } else { ui.relicLockedCard.removeAttribute('hidden'); ui.relicKashiwaCard.setAttribute('hidden',''); } const gain=Math.floor(state.maxFloor/30); ui.soulGain && (ui.soulGain.textContent=gain); ui.nameEdit && (ui.nameEdit.value=state.username||''); }
+  ui.bagGold.textContent=Math.floor(state.gold); ui.bagSoul.textContent=state.souls; ui.bagGem.textContent=state.magicStones; ui.bagPeb.textContent=state.pebbles; ui.bagEq.textContent=state.inv.length; ui.floorBadge.textContent=`階層 ${state.floor}`; if(state.unlocks.kashiwa){ ui.relicLockedCard.setAttribute('hidden',''); ui.relicKashiwaCard.removeAttribute('hidden'); ui.relicKashiwa.checked=!!state.relicActive.kashiwa; } else { ui.relicLockedCard.removeAttribute('hidden'); ui.relicKashiwaCard.setAttribute('hidden',''); } const gain=Math.floor(state.maxFloor/30); ui.soulGain && (ui.soulGain.textContent=gain);
+  // --- 転生欄の説明を所持状況に応じて切り替え ---
+  if(ui.ascDesc){
+    if(state.pebbles>0 || state.magicStones>0){
+      ui.ascDesc.innerHTML = '転生で <b>石ころ→魔石</b> へ変換。さらに <b>ソウル</b> を獲得（恒久強化に使用）。';
+    } else {
+      ui.ascDesc.innerHTML = '転生で <b>ソウル</b> を獲得。ソウルは恒久的に<span class="gold">獲得ゴールド</span>と<b>攻撃力</b>を上げます。';
+    }
+  }
+  ui.nameEdit && (ui.nameEdit.value=state.username||''); }
 
 function getItemDrop(){ const luck=(state.eq.ring?.goldB??0)*0.2; return 0.20 + luck/100 }
 
