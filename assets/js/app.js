@@ -21,6 +21,7 @@ document.getElementById("saveBtn").onclick = () => {
   statusEl.textContent = "SAVED";
 };
 
+// 読み込み時に復元
 const saved = localStorage.getItem("simpleTapScore");
 if (saved !== null) {
   score = Number(saved);
